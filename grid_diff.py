@@ -8,6 +8,10 @@ class PictureComparator:
     def __init__(self, path1 : str, path2 : str):
         self.img1 = cv2.imread(path1)
         self.img2 = cv2.imread(path2)
+        if self.img1 is None: 
+            raise FileNotFoundError(f"Failed to read image {path1}")
+        elif self.img2 is None:
+            raise FileNotFoundError(f"Failed to read image {path2}")
 
     def showImage(self, img, title):
         cv2.namedWindow(title, cv2.WINDOW_NORMAL)
@@ -15,22 +19,16 @@ class PictureComparator:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def calculateAbsDifference(self):
+    def calculateDiffPixels(self):
+        if self.img1.shape != self.img2.shape:
+            raise ValueError("Images are different size")
         self.diff = cv2.absdiff(self.img1, self.img2)
-        nonzeros = np.count_nonzero(self.diff)
-        total = np.prod(self.diff.shape)
-        self.percentage_diff = nonzeros / total * 100.
+        avg = np.mean(self.diff, axis=2)
+        diff_pix = np.count_nonzero(avg)
+        total = avg.shape[0] * avg.shape[1]
+        self.percentage_diff = diff_pix / total * 100.
         print("Difference: {:.2f}%".format(round(self.percentage_diff, 2)))
 
-    def calculateDiffPixels(self):
-        pass
-        # comp_arr = np.all(self.img1, self.img2, axis=-1)
-        # count_true = np.count_nonzero(comp_arr)
-        # diff = count_true / comp_arr.size * 100
-        # diff = 100 - diff
-        # print(diff)
-        
-    
     def showDifference(self):
         try:
             self.showImage(self.diff, "Difference image")
@@ -38,9 +36,8 @@ class PictureComparator:
             print("Calculate the difference!")
 
 def debug(comp):
-    comp.calculateAbsDifference()
-    comp.showDifference()
     comp.calculateDiffPixels()
+    comp.showDifference()
 
 
 if __name__ == "__main__":
