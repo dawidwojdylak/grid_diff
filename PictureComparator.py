@@ -72,7 +72,7 @@ class PictureComparator:
             print("Calculate the difference!")
 
     @staticmethod
-    def showImage(img, title):
+    def showImage(img, title="Title"):
         cv2.namedWindow(title, cv2.WINDOW_NORMAL)
         cv2.imshow(title, img)
         cv2.waitKey(0)
