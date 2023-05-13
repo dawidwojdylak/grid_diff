@@ -41,21 +41,34 @@ class PictureComparator:
         different_pixels = np.where(self.diff_avg != 0., 255., 0.).astype(np.uint8)
 
         diff_mask = np.zeros((self.img1.shape[0], self.img1.shape[1], 4), dtype=np.uint8)
-        diff_mask[:,:,0] = different_pixels
+        diff_mask[:,:,2] = different_pixels
         diff_mask[:,:,3] = matching_pixels
 
         return diff_mask
+    
+    def mergeDiffImage(self):
+        diff_mask = self.getTranspDiffImage()
+        original_img = cv2.cvtColor(self.img1, cv2.COLOR_BGR2BGRA)
+        masked = cv2.bitwise_or(original_img, diff_mask)
+        return masked
     
     def showDifference(self):
         try:
             self.showImage(self.diff, "Difference image")
         except AttributeError:
             print("Calculate the difference!")
+    
+    @staticmethod
+    def printLayers(img, prefix=""):
+        print(prefix)
+        for i in range(img.shape[2]):
+            print(f"Layer {i}:")
+            print(img[:,:,i])
 
 def debug(comp):
     comp.calculateDiffPixels()
-    comp.showDifference()
-    comp.getTranspDiffImage()
+    # comp.getTranspDiffImage()
+    comp.showImage(comp.mergeDiffImage(), "Masked image") 
 
 
 if __name__ == "__main__":
