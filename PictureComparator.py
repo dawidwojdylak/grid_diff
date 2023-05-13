@@ -6,18 +6,22 @@ class PictureComparator:
     TITLE = "Image grid difference app"
     TEXT_COLOR = (0, 0, 255)
     
-    def __init__(self, path1 : str, path2 : str):
-        self.img1 = cv2.imread(path1)
-        self.img2 = cv2.imread(path2)
+    def __init__(self, path1 = None, path2 = None, img1 = None, img2 = None):
+        if path1 is not None and path2 is not None:
+            self.img1 = cv2.imread(path1)
+            self.img2 = cv2.imread(path2)
+            if self.img1 is None: 
+                raise FileNotFoundError(f"Failed to read image {path1}")
+            elif self.img2 is None:
+                raise FileNotFoundError(f"Failed to read image {path2}")
+        elif img1 is not None and img2 is not None:
+            self.img1 = img1
+            self.img2 = img2
 
-        self.diff_avg = None
-
-        if self.img1 is None: 
-            raise FileNotFoundError(f"Failed to read image {path1}")
-        elif self.img2 is None:
-            raise FileNotFoundError(f"Failed to read image {path2}")
         if self.img1.shape != self.img2.shape:
             raise ValueError("Images are different size")
+        
+        self.diff_avg = None
         
     def getDiffImg(self):
         diff_percentage = self.calculateDiffPixels()
@@ -54,10 +58,14 @@ class PictureComparator:
         masked = cv2.bitwise_or(original_img, diff_mask)
         return masked
     
+    def setImages(self, img1 : np.ndarray, img2 : np.ndarray):
+        self.img1 = img1
+        self.img2 = img2
+    
     @staticmethod
     def addText(img, text):
         font = cv2.FONT_HERSHEY_COMPLEX
-        scale = 6
+        scale = 3
         thickness = 4
         text_size, _ = cv2.getTextSize(text, font, scale, thickness)
         x = int((img.shape[1] - text_size[0]) / 2)

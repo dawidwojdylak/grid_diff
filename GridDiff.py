@@ -39,42 +39,55 @@ class GridDiff:
         self.img1_divided = divide(self.img1, n, m)
         self.img2_divided = divide(self.img2, n, m)
 
-    def mergeGrid(self, red_lines : bool = True):
-        def merge(img_divided):
-            n = len(img_divided)
-            m = len(img_divided[0])
+    def compareTiles(self):
+        n = len(self.img1_divided)
+        m = len(self.img1_divided[0])
+        self.comparedTiles = [[None for _ in range(m)] for _ in range(n)]
 
-            height, width, layers = img_divided[0][0].shape # type: ignore
+        for i in range(n):
+            for j in range(m):
+                comparator = PictureComparator(img1 = self.img1_divided[i][j], img2 = self.img2_divided[i][j])
+                diff_img = comparator.getDiffImg()
+                diff_img = diff_img[:,:,0:3]
+                self.comparedTiles[i][j] = diff_img
 
-            merged_img = np.zeros_like(self.img1)
+        return self.comparedTiles
 
-            for i in range(n):
-                for j in range(m):
-                    merged_img[i * height : (i + 1) * height, j * width : (j + 1) * width, :] = img_divided[i][j]
-                    if red_lines:
-                        # horizontal
-                        if i < n - 1:
-                            cv2.line(merged_img, (j * width,      (i + 1) * height), 
-                                                ((j + 1) * width, (i + 1) * height),
-                                                self.RED, thickness=self.LINE_THICKNESS)
-                        # vertical
-                        if j < m - 1:
-                            cv2.line(merged_img,((j + 1) * width, i * height), 
-                                                ((j + 1) * width, (i + 1) * height),
-                                                self.RED, thickness=self.LINE_THICKNESS)
+    def mergeGrid(self, img_divided, red_lines : bool = True):
+        n = len(img_divided)
+        m = len(img_divided[0])
 
-            return merged_img
+        height, width, layers = img_divided[0][0].shape # type: ignore
+
+        merged_img = np.zeros_like(self.img1)
+
+        for i in range(n):
+            for j in range(m):
+                merged_img[i * height : (i + 1) * height, j * width : (j + 1) * width, :] = img_divided[i][j]
+                if red_lines:
+                    # horizontal
+                    if i < n - 1:
+                        cv2.line(merged_img, (j * width,      (i + 1) * height), 
+                                            ((j + 1) * width, (i + 1) * height),
+                                            self.RED, thickness=self.LINE_THICKNESS)
+                    # vertical
+                    if j < m - 1:
+                        cv2.line(merged_img,((j + 1) * width, i * height), 
+                                            ((j + 1) * width, (i + 1) * height),
+                                            self.RED, thickness=self.LINE_THICKNESS)
+
+        return merged_img
         
-        return merge(self.img1_divided), merge(self.img2_divided) 
-
+    
 
 
 
 def debug(diff):
-    diff.divideIntoGrid(4,4)
-    pic1, pic2 = diff.mergeGrid()
-    PictureComparator.showImage(pic1)
-    PictureComparator.showImage(pic2)
+    diff.divideIntoGrid(4, 4)
+    compared = diff.compareTiles()
+    merged = diff.mergeGrid(compared)
+    PictureComparator.showImage(merged)
+    # TODO: make font size adjust automatically
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
