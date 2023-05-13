@@ -18,7 +18,13 @@ class PictureComparator:
             raise FileNotFoundError(f"Failed to read image {path2}")
         if self.img1.shape != self.img2.shape:
             raise ValueError("Images are different size")
-
+        
+    def getDiffImg(self):
+        diff_percentage = self.calculateDiffPixels()
+        masked_img = self.mergeDiffImage()
+        diff_perc_txt = "{:.2f}%".format(round(diff_percentage, 2))
+        diff_img = self.addText(masked_img, diff_perc_txt)
+        return diff_img
 
     def calculateDiffPixels(self):
         self.diff = cv2.absdiff(self.img1, self.img2)
@@ -49,15 +55,15 @@ class PictureComparator:
         return masked
     
     @staticmethod
-    def displayText(img, text):
+    def addText(img, text):
         font = cv2.FONT_HERSHEY_COMPLEX
         scale = 6
         thickness = 4
         text_size, _ = cv2.getTextSize(text, font, scale, thickness)
         x = int((img.shape[1] - text_size[0]) / 2)
         y = int((img.shape[0] + text_size[1]) / 2)
-        img = cv2.putText(img=img, text=text, org=(x, y), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=scale, color=PictureComparator.TEXT_COLOR, thickness=thickness)
-        PictureComparator.showImage(img, "txt")
+        text_img = cv2.putText(img=img, text=text, org=(x, y), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=scale, color=PictureComparator.TEXT_COLOR, thickness=thickness)
+        return text_img
     
     def showDifference(self):
         try:
@@ -80,11 +86,8 @@ class PictureComparator:
             print(img[:,:,i])
 
 def debug(comp):
-    perc = comp.calculateDiffPixels()
-    masked = comp.mergeDiffImage()
-    text = "{:.2f}%".format(round(perc, 2))
-    PictureComparator.displayText(masked, text)
-
+    img = comp.getDiffImg()
+    comp.showImage(img, comp.TITLE)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
