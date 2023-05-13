@@ -8,27 +8,44 @@ class PictureComparator:
     def __init__(self, path1 : str, path2 : str):
         self.img1 = cv2.imread(path1)
         self.img2 = cv2.imread(path2)
+
+        self.diff_avg = None
+
         if self.img1 is None: 
             raise FileNotFoundError(f"Failed to read image {path1}")
         elif self.img2 is None:
             raise FileNotFoundError(f"Failed to read image {path2}")
+        if self.img1.shape != self.img2.shape:
+            raise ValueError("Images are different size")
 
-    def showImage(self, img, title):
+    @staticmethod
+    def showImage(img, title):
         cv2.namedWindow(title, cv2.WINDOW_NORMAL)
         cv2.imshow(title, img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
     def calculateDiffPixels(self):
-        if self.img1.shape != self.img2.shape:
-            raise ValueError("Images are different size")
         self.diff = cv2.absdiff(self.img1, self.img2)
-        avg = np.mean(self.diff, axis=2)
-        diff_pix = np.count_nonzero(avg)
-        total = avg.shape[0] * avg.shape[1]
+        self.diff_avg = np.mean(self.diff, axis=2)
+        diff_pix = np.count_nonzero(self.diff_avg)
+        total = self.diff_avg.shape[0] * self.diff_avg.shape[1]
         self.percentage_diff = diff_pix / total * 100.
         print("Difference: {:.2f}%".format(round(self.percentage_diff, 2)))
 
+    def getTranspDiffImage(self):
+        if self.diff_avg is None:
+            self.calculateDiffPixels()
+
+        matching_pixels = np.where(self.diff_avg == 0., 255., 0.).astype(np.uint8)
+        different_pixels = np.where(self.diff_avg != 0., 255., 0.).astype(np.uint8)
+
+        diff_mask = np.zeros((self.img1.shape[0], self.img1.shape[1], 4), dtype=np.uint8)
+        diff_mask[:,:,0] = different_pixels
+        diff_mask[:,:,3] = matching_pixels
+
+        return diff_mask
+    
     def showDifference(self):
         try:
             self.showImage(self.diff, "Difference image")
@@ -38,6 +55,7 @@ class PictureComparator:
 def debug(comp):
     comp.calculateDiffPixels()
     comp.showDifference()
+    comp.getTranspDiffImage()
 
 
 if __name__ == "__main__":
