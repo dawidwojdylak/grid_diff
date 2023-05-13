@@ -5,6 +5,9 @@ import numpy as np
 from PictureComparator import PictureComparator
 
 class GridDiff:
+    RED = (0, 0, 255)
+    LINE_THICKNESS = 3
+
     def __init__(self, path1 : str, path2 : str):
         self.img1 = cv2.imread(path1)
         self.img2 = cv2.imread(path2)
@@ -36,7 +39,7 @@ class GridDiff:
         self.img1_divided = divide(self.img1, n, m)
         self.img2_divided = divide(self.img2, n, m)
 
-    def mergeGrid(self):
+    def mergeGrid(self, red_lines : bool = True):
         def merge(img_divided):
             n = len(img_divided)
             m = len(img_divided[0])
@@ -48,7 +51,18 @@ class GridDiff:
             for i in range(n):
                 for j in range(m):
                     merged_img[i * height : (i + 1) * height, j * width : (j + 1) * width, :] = img_divided[i][j]
-            
+                    if red_lines:
+                        # horizontal
+                        if i < n - 1:
+                            cv2.line(merged_img, (j * width,      (i + 1) * height), 
+                                                ((j + 1) * width, (i + 1) * height),
+                                                self.RED, thickness=self.LINE_THICKNESS)
+                        # vertical
+                        if j < m - 1:
+                            cv2.line(merged_img,((j + 1) * width, i * height), 
+                                                ((j + 1) * width, (i + 1) * height),
+                                                self.RED, thickness=self.LINE_THICKNESS)
+
             return merged_img
         
         return merge(self.img1_divided), merge(self.img2_divided) 
@@ -57,7 +71,7 @@ class GridDiff:
 
 
 def debug(diff):
-    diff.divideIntoGrid()
+    diff.divideIntoGrid(4,4)
     pic1, pic2 = diff.mergeGrid()
     PictureComparator.showImage(pic1)
     PictureComparator.showImage(pic2)
