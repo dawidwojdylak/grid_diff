@@ -6,17 +6,9 @@ class PictureComparator:
     TITLE = "Image grid difference app"
     TEXT_COLOR = (0, 0, 255)
     
-    def __init__(self, path1 = None, path2 = None, img1 = None, img2 = None):
-        if path1 is not None and path2 is not None:
-            self.img1 = cv2.imread(path1)
-            self.img2 = cv2.imread(path2)
-            if self.img1 is None: 
-                raise FileNotFoundError(f"Failed to read image {path1}")
-            elif self.img2 is None:
-                raise FileNotFoundError(f"Failed to read image {path2}")
-        elif img1 is not None and img2 is not None:
-            self.img1 = img1
-            self.img2 = img2
+    def __init__(self, img1 = None, img2 = None):
+        self.img1 = img1
+        self.img2 = img2
 
         if self.img1.shape != self.img2.shape:
             raise ValueError("Images are different size")
@@ -92,15 +84,4 @@ class PictureComparator:
         for i in range(img.shape[2]):
             print(f"Layer {i}:")
             print(img[:,:,i])
-
-def debug(comp):
-    img = comp.getDiffImg()
-    comp.showImage(img, comp.TITLE)
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        comp = PictureComparator('examples/01_bird_norm.png', 'examples/01_bird_edit.png')
-    else:
-        comp = PictureComparator(sys.argv[1], sys.argv[2])
-    debug(comp)
 
