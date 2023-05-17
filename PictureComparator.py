@@ -28,7 +28,6 @@ class PictureComparator:
         diff_pix = np.count_nonzero(self.diff_avg)
         total = self.diff_avg.shape[0] * self.diff_avg.shape[1]
         self.percentage_diff = diff_pix / total * 100.
-        print("Difference: {:.2f}%".format(round(self.percentage_diff, 2)))
         return self.percentage_diff
 
     def getTranspDiffImage(self):
