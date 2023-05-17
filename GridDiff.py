@@ -8,14 +8,9 @@ class GridDiff:
     RED = (0, 0, 255)
     LINE_THICKNESS = 3
 
-    def __init__(self, path1 : str, path2 : str):
-        self.img1 = cv2.imread(path1)
-        self.img2 = cv2.imread(path2)
-
-        if self.img1 is None: 
-            raise FileNotFoundError(f"Failed to read image {path1}")
-        elif self.img2 is None:
-            raise FileNotFoundError(f"Failed to read image {path2}")
+    def __init__(self, img1, img2):
+        self.img1 = img1
+        self.img2 = img2
         
         if self.img1.shape != self.img2.shape:
             if self.img1.shape[0] * self.img1.shape[1] > self.img2.shape[0] * self.img2.shape[1]:
@@ -80,18 +75,4 @@ class GridDiff:
         
     
 
-
-
-def debug(diff):
-    diff.divideIntoGrid(4, 4)
-    compared = diff.compareTiles()
-    merged = diff.mergeGrid(compared)
-    PictureComparator.showImage(merged)
-    # TODO: make font size adjust automatically
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        diff = GridDiff('examples/01_bird_norm.png', 'examples/01_bird_edit.png')
-    else:
-        diff = GridDiff(sys.argv[1], sys.argv[2])
-    debug(diff)
+# TODO: make font size adjust automatically
