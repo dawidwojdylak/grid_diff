@@ -75,8 +75,12 @@ class PictureComparator:
     def showImage(img, title="Title"):
         cv2.namedWindow(title, cv2.WINDOW_NORMAL)
         cv2.imshow(title, img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+
+        while cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) >= 1:
+            keyCode = cv2.waitKey(1000)
+            if (keyCode & 0xFF) == ord("q"):
+                cv2.destroyAllWindows()
+                break
     
     @staticmethod
     def printLayers(img, prefix=""):
