@@ -10,11 +10,12 @@ def parse():
     parser.add_argument("img2", type=str, help="2nd image path")
     parser.add_argument("-g", "--grid", nargs=2, metavar=('rows', 'cols'), default=None, help="Grid size (rows x cols)", type=int)
     parser.add_argument("-o", "--output", type=str, help="Output image path")
+    parser.add_argument("-t", "--tolerance", type=int, help="Pixel comparison tolerance")
 
     args = parser.parse_args()
     return args
 
-def compare(img1_path, img2_path, dimensions, output):
+def compare(img1_path, img2_path, dimensions, output, tolerance):
     img1 = cv2.imread(img1_path)
     img2 = cv2.imread(img2_path)
 
@@ -25,6 +26,7 @@ def compare(img1_path, img2_path, dimensions, output):
 
     if dimensions is None:
         comp = PictureComparator(img1, img2)
+        comp.setTolerance(tolerance)
         img = comp.getDiffImg()
         if output is not None:
             cv2.imwrite(output, img)
@@ -33,7 +35,7 @@ def compare(img1_path, img2_path, dimensions, output):
     else:
         gridDiff = GridDiff(img1, img2)
         gridDiff.divideIntoGrid(dimensions[0], dimensions[1])
-        compared = gridDiff.compareTiles()
+        compared = gridDiff.compareTiles(tolerance)
         merged = gridDiff.mergeGrid(compared)
         if output is not None:
             cv2.imwrite(output, merged)
@@ -43,4 +45,4 @@ def compare(img1_path, img2_path, dimensions, output):
 
 if __name__ == "__main__":
     args = parse()
-    compare(args.img1, args.img2, args.grid, args.output)
+    compare(args.img1, args.img2, args.grid, args.output, args.tolerance)

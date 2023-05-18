@@ -34,7 +34,7 @@ class GridDiff:
         self.img1_divided = divide(self.img1, n, m)
         self.img2_divided = divide(self.img2, n, m)
 
-    def compareTiles(self):
+    def compareTiles(self, tolerance = None):
         n = len(self.img1_divided)
         m = len(self.img1_divided[0])
         self.comparedTiles = [[None for _ in range(m)] for _ in range(n)]
@@ -42,6 +42,7 @@ class GridDiff:
         for i in range(n):
             for j in range(m):
                 comparator = PictureComparator(img1 = self.img1_divided[i][j], img2 = self.img2_divided[i][j])
+                comparator.setTolerance(tolerance)
                 diff_img = comparator.getDiffImg()
                 diff_img = diff_img[:,:,0:3]
                 self.comparedTiles[i][j] = diff_img

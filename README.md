@@ -29,7 +29,7 @@ python -m pip install -r ./requirements.txt
 ## Usage
 
 ```
-usage: main.py [-h] [-g rows cols] [-o OUTPUT] img1 img2
+usage: main.py [-h] [-g rows cols] [-o OUTPUT] [-t TOLERANCE] img1 img2
 ```
 ### Positional Arguments
 ```
@@ -44,6 +44,8 @@ img2                  2nd image path
                         Grid size (rows x cols)
   -o OUTPUT, --output OUTPUT
                         Output image path
+  -t TOLERANCE, --tolerance TOLERANCE
+                        Pixel comparison tolerance
 ```
 
 ## Examples of usage
@@ -51,6 +53,11 @@ img2                  2nd image path
 Compare two images:
 ```
 python ./main.py examples/01_bird_norm.png examples/01_bird_edit.png
+```
+
+Compare two images with pixel tolerance = 15
+```
+python ./main.py examples/02_laptop.png examples/02_laptop_edit.png -t 15 
 ```
 
 Compare two images using a 4x5 grid:

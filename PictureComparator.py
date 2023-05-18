@@ -14,6 +14,12 @@ class PictureComparator:
             raise ValueError("Images are different size")
         
         self.diff_avg = None
+        self.tolerance = None
+
+    def setTolerance(self, tol):
+        if tol is not None and (tol > 255 or tol < 0):
+            raise ValueError("Tolerance should be in range [0, 255]")
+        self.tolerance = tol
         
     def getDiffImg(self):
         diff_percentage = self.calculateDiffPixels()
@@ -25,6 +31,7 @@ class PictureComparator:
     def calculateDiffPixels(self):
         self.diff = cv2.absdiff(self.img1, self.img2)
         self.diff_avg = np.mean(self.diff, axis=2)
+        if self.tolerance: self.diff_avg = self.diff_avg > self.tolerance
         diff_pix = np.count_nonzero(self.diff_avg)
         total = self.diff_avg.shape[0] * self.diff_avg.shape[1]
         self.percentage_diff = diff_pix / total * 100.
