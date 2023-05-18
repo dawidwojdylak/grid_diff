@@ -21,12 +21,6 @@ class GridDiff:
         """
         self.img1 = img1
         self.img2 = img2
-        
-        if self.img1.shape != self.img2.shape:
-            if self.img1.shape[0] * self.img1.shape[1] > self.img2.shape[0] * self.img2.shape[1]:
-                self.img1 = cv2.resize(self.img1, (self.img2.shape[1], self.img2.shape[0]))
-            else:
-                self.img2 = cv2.resize(self.img2, (self.img1.shape[1], self.img1.shape[0]))
 
     def divideIntoGrid(self, n = 4, m = 4):
         """

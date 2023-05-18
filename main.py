@@ -19,6 +19,12 @@ def compare(img1_path, img2_path, dimensions, output, tolerance):
     img1 = cv2.imread(img1_path)
     img2 = cv2.imread(img2_path)
 
+    if img1.shape != img2.shape:
+        if img1.shape[0] * img1.shape[1] > img2.shape[0] * img2.shape[1]:
+            img1 = cv2.resize(img1, (img2.shape[1], img2.shape[0]))
+        else:
+            img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
+
     if img1 is None: 
         raise FileNotFoundError(f"Failed to read image {img1_path}")
     elif img2 is None:
