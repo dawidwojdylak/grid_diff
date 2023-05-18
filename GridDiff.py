@@ -5,10 +5,20 @@ import numpy as np
 from PictureComparator import PictureComparator
 
 class GridDiff:
+    """
+    A class for slicing two images into grid and comparing them with PictureComparator class. 
+    """
     RED = (0, 0, 255)
     LINE_THICKNESS = 3
 
     def __init__(self, img1, img2):
+        """
+        Initializes a class instance with images to be sliced and compared.
+
+        Args:
+            img1 (numpy.ndarray) : first image
+            img2 (numpy.ndarray) : second image
+        """
         self.img1 = img1
         self.img2 = img2
         
@@ -19,6 +29,13 @@ class GridDiff:
                 self.img2 = cv2.resize(self.img2, (self.img1.shape[1], self.img1.shape[0]))
 
     def divideIntoGrid(self, n = 4, m = 4):
+        """
+        Slices images into (n x m) size grid.
+
+        Args:
+            n (int) : number of rows
+            m (int) : number of columns
+        """
         def divide(img, n, m):
             height = img.shape[0] // n
             width = img.shape[1] // m
@@ -35,6 +52,15 @@ class GridDiff:
         self.img2_divided = divide(self.img2, n, m)
 
     def compareTiles(self, tolerance = None):
+        """
+        Compares slices using PictureComparator.
+
+        Args:
+            tolerance (int) : tolerance of calculating a difference between pixels
+
+        Returns:
+            A list of compared images.
+        """
         n = len(self.img1_divided)
         m = len(self.img1_divided[0])
         self.comparedTiles = [[None for _ in range(m)] for _ in range(n)]
@@ -50,6 +76,16 @@ class GridDiff:
         return self.comparedTiles
 
     def mergeGrid(self, img_divided, red_lines : bool = True):
+        """
+        Merges sliced image into image of original size.
+
+        Args:
+            img_divided (list) : List of compared images
+            red_lines (bool) : Check value if red grid lines should be drawn
+
+        Returns:
+            A merged image 
+        """
         n = len(img_divided)
         m = len(img_divided[0])
 
@@ -75,5 +111,3 @@ class GridDiff:
         return merged_img
         
     
-
-# TODO: make font size adjust automatically
