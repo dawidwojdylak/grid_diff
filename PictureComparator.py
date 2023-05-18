@@ -24,6 +24,7 @@ class PictureComparator:
     def getDiffImg(self):
         diff_percentage = self.calculateDiffPixels()
         masked_img = self.mergeDiffImage()
+        masked_img[self.diff_avg != 0, :2] = 0
         diff_perc_txt = "{:.2f}%".format(round(diff_percentage, 2))
         diff_img = self.addText(masked_img, diff_perc_txt)
         return diff_img
